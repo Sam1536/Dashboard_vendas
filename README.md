@@ -1,4 +1,4 @@
-# Dashboard_vendas
+# Dashboard vendas
 
 # 📊 Dashboard de Vendas | Power BI
 
