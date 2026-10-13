@@ -1,0 +1,109 @@
+table fVendas
+	lineageTag: 2e9703ed-2b75-4eef-808d-a7d4a235fbd8
+
+	column 'Data da Venda'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f314b3e5-b5e4-4e48-bdb6-cadb56455a57
+		summarizeBy: none
+		sourceColumn: Data da Venda
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Ordem de Compra'
+		dataType: string
+		lineageTag: cbed119f-ea44-4eb2-a11f-bad4990941c3
+		summarizeBy: none
+		sourceColumn: Ordem de Compra
+
+		annotation SummarizationSetBy = Automatic
+
+	column SKU
+		dataType: string
+		isHidden
+		lineageTag: fdfdf5f2-f940-4666-8f82-921358418f7c
+		summarizeBy: none
+		sourceColumn: SKU
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID Cliente'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f3a1c0d5-844e-4cd5-92b7-7068fe4e008a
+		summarizeBy: none
+		sourceColumn: ID Cliente
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Qtd Vendida'
+		dataType: int64
+		formatString: 0
+		lineageTag: 195ac322-313f-4cfa-ba36-4116b70707f6
+		summarizeBy: sum
+		sourceColumn: Qtd Vendida
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID Loja'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f6b96be9-8c2b-4c35-bf59-c09708146bea
+		summarizeBy: none
+		sourceColumn: ID Loja
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo do Produto' = IF(fVendas[Qtd Vendida] = 1, "Pedido Único", "Pedido Múltiplo" )
+		lineageTag: b6141177-5de6-4489-9b44-c3a31bf15c53
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dia das Mães Promoção' =
+			IF(RELATED(dCliente[Genero]) = "Feminino"
+			 && RELATED(dCliente[Num Filhos]) >= 1
+			 && MONTH(fVendas[Data da Venda]) = 5,
+			 // ou RELATED(dCalendario[Mês]) = 5,
+			 ROUND(RELATED(dProduto[Preço Unitario])*0.85, 2),
+			 RELATED(dProduto[Preço Unitario])
+			)
+		isHidden
+		formatString: 0.00
+		lineageTag: 16406eae-5aa5-435e-8116-d916f05d0c93
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fVendas = m
+		mode: import
+		source =
+				let
+				    Fonte = Folder.Files(Caminho),
+				    #"Linhas Filtradas1" = Table.SelectRows(Fonte, each Text.StartsWith([Name], "Base Vendas")),
+				    #"Arquivos Ocultos Filtrados1" = Table.SelectRows(#"Linhas Filtradas1", each [Attributes]?[Hidden]? <> true),
+				    #"Invocar Função Personalizada1" = Table.AddColumn(#"Arquivos Ocultos Filtrados1", "Transformar Arquivo", each #"Transformar Arquivo"([Content])),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Invocar Função Personalizada1", {"Name", "Nome da Origem"}),
+				    #"Outras Colunas Removidas1" = Table.SelectColumns(#"Colunas Renomeadas1", {"Nome da Origem", "Transformar Arquivo"}),
+				    #"Coluna de Tabela Expandida1" = Table.ExpandTableColumn(#"Outras Colunas Removidas1", "Transformar Arquivo", Table.ColumnNames(#"Transformar Arquivo"(#"Arquivo de Amostra"))),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Coluna de Tabela Expandida1",{{"Nome da Origem", type text}, {"Data da Venda", type date}, {"Ordem de Compra", type text}, {"SKU", type text}, {"ID Cliente", Int64.Type}, {"Qtd Vendida", Int64.Type}, {"ID Loja", Int64.Type}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado",{"Nome da Origem"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

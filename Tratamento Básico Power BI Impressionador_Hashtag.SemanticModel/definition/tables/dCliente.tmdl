@@ -1,0 +1,168 @@
+table dCliente
+	lineageTag: 93758988-ce9a-452a-a7c6-4095cacd440d
+
+	column 'ID Cliente'
+		dataType: int64
+		formatString: 0
+		lineageTag: ac78df09-8ac8-4c81-8f27-f9563013c4be
+		summarizeBy: none
+		sourceColumn: ID Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: 97c459cf-cf8d-4554-9f29-3bc6f748c160
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Genero
+		dataType: string
+		lineageTag: 8fc50c57-7669-4306-8fab-10c59aca1f3c
+		summarizeBy: none
+		sourceColumn: Genero
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data Nascimento'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 66a9350e-7bcb-4085-b2c7-c88b51b7787b
+		summarizeBy: none
+		sourceColumn: Data Nascimento
+
+		variation Variation
+			isDefault
+			relationship: 295c08bf-54c1-4d4a-9259-f287543569b7
+			defaultHierarchy: LocalDateTable_0260da34-fd80-4489-8577-a3dad850dde2.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Estado Civil'
+		dataType: string
+		lineageTag: f9b8c2c9-0d5e-458b-8ef8-03da064f255f
+		summarizeBy: none
+		sourceColumn: Estado Civil
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Num Filhos'
+		dataType: int64
+		formatString: 0
+		lineageTag: ced16cc2-5dec-4f24-b59e-84bbdb9a7be5
+		summarizeBy: sum
+		sourceColumn: Num Filhos
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nivel Escolar'
+		dataType: string
+		lineageTag: 4a6973fe-b44c-42f3-b344-c5a47c787991
+		summarizeBy: none
+		sourceColumn: Nivel Escolar
+
+		annotation SummarizationSetBy = Automatic
+
+	column Documento
+		dataType: string
+		lineageTag: 5773f680-f51b-4f21-b069-c060bffe32e7
+		summarizeBy: none
+		sourceColumn: Documento
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome
+		dataType: string
+		lineageTag: fd667b56-629f-48a0-92e7-7aa06255768c
+		summarizeBy: none
+		sourceColumn: Nome
+
+		annotation SummarizationSetBy = Automatic
+
+	column Idade
+		dataType: int64
+		formatString: 0
+		lineageTag: 8dcb8f65-8843-46cf-a424-4323830ed811
+		summarizeBy: sum
+		sourceColumn: Idade
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Faixa Etaria' =
+			SWITCH(TRUE(),
+			dCliente[Idade] <= 20, "Jovem",
+			dCliente[Idade] <= 50, "Adulto",
+			"Sênio")
+		lineageTag: 9d1e5ff8-7b08-42c4-9064-5a5d2329037c
+		summarizeBy: none
+		sortByColumn: 'Numeração Faixa Etária'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Numeração Faixa Etária' =
+			SWITCH(TRUE(),
+			dCliente[Idade] <= 20, 1,
+			dCliente[Idade] <= 50, 2,
+			3)
+		formatString: 0
+		lineageTag: af980447-4258-4e4c-afac-0058d4319533
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Desconto = ```
+			SWITCH(dCliente[Nivel Escolar],
+			"Pós Graduação", 0.2,
+			"Superior Completo", 0.1,
+			"Superior Incompleto", 0.05,
+			0)
+			// Formula de cima e mais direta e simples e so usamos ela como for usa com (True E <= ou >=)
+			
+			// Antigo com (true e com <= ou >=)
+			/* 
+			Desconto = SWITCH(TRUE(),
+			dCliente[Nivel Escolar] = "Pós Graduação", 0.2,
+			dCliente[Nivel Escolar] = "Superior Completo", 0.1,
+			dCliente[Nivel Escolar] = "Superior Incompleto", 0.05,
+			0) 
+			*/
+			```
+		lineageTag: 61fc7b12-e077-4553-b048-b79156a82b71
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition dCliente = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(Caminho & "\Cadastro Clientes.xlsx"), null, true),
+				    Plan1_Sheet = Fonte{[Item="Plan1",Kind="Sheet"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Plan1_Sheet,{{"Column1", type any}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type text}, {"Column8", type any}, {"Column9", type text}, {"Column10", type any}, {"Column11", type any}, {"Column12", type any}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Cabeçalhos Promovidos",{"Column11", "Column12"}),
+				    #"Tipo Alterado com Localidade" = Table.TransformColumnTypes(#"Colunas Removidas", {{"Data Nascimento", type date}}, "en-US"),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Tipo Alterado com Localidade",{{"Documento", type text}, {"Num Filhos", Int64.Type}, {"ID Cliente", Int64.Type}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Tipo Alterado1","M","Masculino",Replacer.ReplaceText,{"Genero"}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","F","Feminino ",Replacer.ReplaceText,{"Genero"}),
+				    #"Colunas Mescladas" = Table.CombineColumns(#"Valor Substituído1",{"Primeiro Nome", "Sobrenome"},Combiner.CombineTextByDelimiter(" ", QuoteStyle.None),"Nome"),
+				    #"Colocar Cada Palavra Em Maiúscula" = Table.TransformColumns(#"Colunas Mescladas",{{"Nome", Text.Proper, type text}}),
+				    #"Idade Inserida" = Table.AddColumn(#"Colocar Cada Palavra Em Maiúscula", "Idade", each Date.From(DateTime.LocalNow()) - [Data Nascimento], type duration),
+				    #"Total de Anos Calculado" = Table.TransformColumns(#"Idade Inserida",{{"Idade", each Duration.TotalDays(_) / 365, type number}}),
+				    #"Arredondado para Baixo" = Table.TransformColumns(#"Total de Anos Calculado",{{"Idade", Number.RoundDown, Int64.Type}})
+				in
+				    #"Arredondado para Baixo"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

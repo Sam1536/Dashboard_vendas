@@ -1,0 +1,92 @@
+expression 'dCadastro Localidade' =
+		let
+		    Fonte = Excel.Workbook(File.Contents(Caminho & "\Cadastro Localidades.xlsx"), null, true),
+		    Plan1_Sheet = Fonte{[Item="Plan1",Kind="Sheet"]}[Data],
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Plan1_Sheet, [PromoteAllScalars=true]),
+		    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"ID Localidade", Int64.Type}, {"País", type text}, {"Continente", type text}})
+		in
+		    #"Tipo Alterado"
+	lineageTag: f349c1ea-75cd-43ee-a013-7edd01b2c5a1
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
+expression Parâmetro1 = #"Arquivo de Amostra" meta [IsParameterQuery=true, BinaryIdentifier=#"Arquivo de Amostra", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: dcf79104-ac05-4991-9319-a250eab4ddc6
+	queryGroup: 'Transformar Arquivo de Aula 1 - Importando Base de Dados\Consultas Auxiliares'
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar o Arquivo de Exemplo' =
+		let
+		    Fonte = Excel.Workbook(Parâmetro1, null, true),
+		    Plan1_Sheet = Fonte{[Item="Plan1",Kind="Sheet"]}[Data],
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Plan1_Sheet, [PromoteAllScalars=true])
+		in
+		    #"Cabeçalhos Promovidos"
+	lineageTag: bb4a0294-2012-45ed-93cb-2fcb674f17fc
+	queryGroup: 'Transformar Arquivo de Aula 1 - Importando Base de Dados'
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
+expression 'Arquivo de Amostra' =
+		let
+		    Fonte = Folder.Files(Caminho),
+		    #"Linhas Filtradas" = Table.SelectRows(Fonte, each true),
+		    #"Linhas Filtradas1" = Table.SelectRows(#"Linhas Filtradas", each Text.StartsWith([Name], "Base Vendas")),
+		    Navegação1 = #"Linhas Filtradas1"{0}[Content]
+		in
+		    Navegação1
+	lineageTag: 47f00552-2c9b-442e-9ccf-fbd746e7cd3a
+	queryGroup: 'Transformar Arquivo de Aula 1 - Importando Base de Dados\Consultas Auxiliares'
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar Arquivo' =
+		let
+		    Fonte = (Parâmetro1 as binary) => let
+		    Fonte = Excel.Workbook(Parâmetro1, null, true),
+		    Plan1_Sheet = Fonte{[Item="Plan1",Kind="Sheet"]}[Data],
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Plan1_Sheet, [PromoteAllScalars=true])
+		in
+		    #"Cabeçalhos Promovidos"
+		in
+		    Fonte
+	mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transformar o Arquivo de Exemplo""}" ]
+	lineageTag: 1459131e-8d88-4944-beac-374d6b762497
+	queryGroup: 'Transformar Arquivo de Aula 1 - Importando Base de Dados\Consultas Auxiliares'
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Function
+
+expression Caminho = "C:\Users\a-agn\Documents\PoweBi Exercícios e Outros\PowerBI_Impressionador_Hashtag_2023 Materia\Importação e Tratamento de BD-Power Query\Tratando a Base Cadastro Clientes\Aula 1 - Importando Base de Dados" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: a43c5120-852f-4754-af2c-702cfd19e666
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Text
+
+expression Imagens =
+		let
+		    Fonte = Excel.Workbook(File.Contents("C:\Users\a-agn\Documents\PoweBi Exercícios e Outros\PowerBI_Impressionador_Hashtag_2023 Materia\Importação e Tratamento de BD-Power Query\Tratando a Base Cadastro Clientes\Aula 1 - Importando Base de Dados\Imagens.xlsx"), null, true),
+		    Plan1_Sheet = Fonte{[Item="Plan1",Kind="Sheet"]}[Data],
+		    #"Tipo Alterado" = Table.TransformColumnTypes(Plan1_Sheet,{{"Column1", type text}, {"Column2", type text}}),
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"Tipo Alterado", [PromoteAllScalars=true]),
+		    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Tipo do Produto", type text}, {"Imagem", type text}}),
+		    #"Linhas Inferiores Removidas" = Table.RemoveLastN(#"Tipo Alterado1",8)
+		in
+		    #"Linhas Inferiores Removidas"
+	lineageTag: e185500d-e6bf-405e-829e-7b6537e6d42f
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

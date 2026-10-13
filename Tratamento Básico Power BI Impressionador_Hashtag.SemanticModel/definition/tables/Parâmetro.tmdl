@@ -1,0 +1,48 @@
+table Parâmetro
+	lineageTag: 7ab6d286-21a5-426f-9be7-c5586e415314
+
+	column Parâmetro
+		lineageTag: 1ad51076-8a4c-41d5-9c1c-7878836c15e5
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Parâmetro Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'Parâmetro Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parâmetro Campos'
+		isHidden
+		lineageTag: 4ace6ec2-6ec4-40dc-995c-84005b175e9b
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Parâmetro Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parâmetro Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: 5c3ff2a2-448c-48cb-9cb4-9b92cee4294f
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Parâmetro = calculated
+		mode: import
+		source =
+				{
+				    ("Total Vendida", NAMEOF('_Medidas'[Total Vendida]), 0),
+				    ("Faturamento Total", NAMEOF('_Medidas'[Faturamento Total]), 1)
+				}
+
+	annotation PBI_Id = fe55afbacf3b4b6b94261c39c3e399e5
+

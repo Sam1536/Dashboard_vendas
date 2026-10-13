@@ -1,0 +1,70 @@
+table fDevoluções
+	lineageTag: a4778ccb-2a7d-4aa9-bd86-c27c3a3f64c8
+
+	column 'Data Devolução'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 66a7b6e6-ae35-490f-849b-aba6c14d4e41
+		summarizeBy: none
+		sourceColumn: Data Devolução
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'ID Loja'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8da86cf1-ae5b-4e17-bc31-6695bac8890f
+		summarizeBy: none
+		sourceColumn: ID Loja
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SKU
+		dataType: string
+		isHidden
+		lineageTag: 51193c82-4c3b-4559-8805-1208a6b34577
+		summarizeBy: none
+		sourceColumn: SKU
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Qtd Devolvida'
+		dataType: int64
+		formatString: 0
+		lineageTag: aa5e037d-0820-4564-a887-1da02d7a2baf
+		summarizeBy: sum
+		sourceColumn: Qtd Devolvida
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Motivo Devolução'
+		dataType: string
+		lineageTag: 0b349219-7a2a-4663-912a-4a9ef9a35265
+		summarizeBy: none
+		sourceColumn: Motivo Devolução
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fDevoluções = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\a-agn\Documents\PoweBi Exercícios e Outros\PowerBI_Impressionador_Hashtag_2023 Materia\Importação e Tratamento de BD-Power Query\Tratando a Base Cadastro Clientes\Aula 1 - Importando Base de Dados\Base Devoluções.xlsx"), null, true),
+				    Plan1_Sheet = Fonte{[Item="Plan1",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Plan1_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Data Devolução", type date}, {"ID Loja", Int64.Type}, {"SKU", type text}, {"Qtd Devolvida", Int64.Type}, {"Motivo Devolução", type text}}),
+				    #"Linhas em Branco Removidas" = Table.SelectRows(#"Tipo Alterado", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+				in
+				    #"Linhas em Branco Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

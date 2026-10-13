@@ -1,0 +1,89 @@
+table dCalendario
+	lineageTag: 0e6f80e8-bb80-4559-a443-d3a429853839
+
+	column Datas
+		formatString: Short Date
+		lineageTag: 01756340-fc70-4d53-9cf4-fcfb2e56a134
+		summarizeBy: none
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: 931ae660-3677-4db0-9cf3-004e7af8ceb8
+			defaultHierarchy: LocalDateTable_82d72740-b4b6-4f7c-bb39-859512559b70.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ano = YEAR(dCalendario[Datas])
+		formatString: 0
+		lineageTag: 4fcf1131-008f-4b8c-a4e0-15ec7827af8b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Num Mês' = MONTH(dCalendario[Datas])
+		formatString: 0
+		lineageTag: b01f40c2-89e9-4fea-a868-4dff06717e66
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mês = dCalendario[Datas].[Mês]
+		lineageTag: 36134861-79ee-488a-ab9a-7e7abbd14793
+		summarizeBy: none
+		sortByColumn: 'Num Mês'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Inicio do Mês' = STARTOFMONTH(dCalendario[Datas])
+		formatString: mmm/yyyy
+		lineageTag: a2d5def6-5d80-4acf-a461-455961cdacf7
+		summarizeBy: none
+
+		variation Variation
+			isDefault
+			relationship: a19506e8-1834-4a9a-b40e-85ad715d55d8
+			defaultHierarchy: LocalDateTable_61e19ca0-2bcb-4a6b-970d-b80d0691d4d0.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column Trimestre = QUARTER(dCalendario[Datas])
+		formatString: 0
+		lineageTag: 39968b8a-f0ee-40ea-91d9-b149b1f4bcb0
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nome Trimestre' = dCalendario[Datas].[Trimestre]
+		lineageTag: 4c1e7d67-661d-48f8-94d9-f8fa61f32c65
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data Vigente?' =
+			IF(
+			    dCalendario[Datas] <= MAX(fVendas[Data da Venda]),
+			    "Sim",
+			    "Não"
+			)
+		lineageTag: ff6cd98c-3296-4d1f-a9bc-0580f0ee2e54
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dCalendario = calculated
+		mode: import
+		source =
+				CALENDAR(
+				    DATE(YEAR(MIN(fVendas[Data da Venda])), 1, 1),
+				    DATE(YEAR(MAX(fVendas[Data da Venda])), 12, 31)
+				)
+
+	annotation PBI_Id = d96a3bf56939432ab6f9966d4ff6e251
+

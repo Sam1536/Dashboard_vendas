@@ -1,0 +1,138 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.0.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY25SU11",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "CY23SU028576096688174631.json",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "enlightenDataStoryDDFB78A6143E42CFAFBC50CCF18D978D",
+    "ScrollingTextVisual1448795304508",
+    "PBI_CV_16948668_E17D_454B_8664_2F2C470EA8C1",
+    "simpleImageEBC4593F96F1425FB3D84C5BF02B5075"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY25SU11",
+          "path": "BaseThemes/CY25SU11.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "CY23SU028576096688174631.json",
+          "path": "CY23SU028576096688174631.json",
+          "type": "CustomTheme"
+        },
+        {
+          "name": "Slide8.10615630954408678.jpg",
+          "path": "Slide8.10615630954408678.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "Slide5.1.13849305529919741.jpg",
+          "path": "Slide5.1.13849305529919741.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "slide9.38250702916789964.jpg",
+          "path": "slide9.38250702916789964.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "filtro778103170781286.png",
+          "path": "filtro778103170781286.png",
+          "type": "Image"
+        },
+        {
+          "name": "fechar-simbolo-de-botao-circul938981935176686.png",
+          "path": "fechar-simbolo-de-botao-circul938981935176686.png",
+          "type": "Image"
+        },
+        {
+          "name": "Slide18864133926501764.jpg",
+          "path": "Slide18864133926501764.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "Slide27506974897005113.jpg",
+          "path": "Slide27506974897005113.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "Slide35561674974269067.jpg",
+          "path": "Slide35561674974269067.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "Slide43062727550651124.jpg",
+          "path": "Slide43062727550651124.jpg",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultFilterActionIsDataFilter": true,
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true,
+    "queryLimitOption": "None",
+    "customMemoryLimit": "1048576",
+    "customTimeoutLimit": "225"
+  }
+}
